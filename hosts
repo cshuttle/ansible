@@ -1,8 +1,8 @@
 [Router]
-Router
+Router.int.intergrem.com
 
 [StorageInfrastructure]
-NAS
+NAS.int.intergrem.com
 
 [Docker]
 Docker.int.intergrem.com
