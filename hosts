@@ -17,7 +17,7 @@ Splunk.int.intergrem.com
 MagicMirror.int.intergrem.com
 Mirror.int.intergrem.com
 Homebridge.int.intergrem.com
-docker-network.int.intergrem.com
+Docker-network.int.intergrem.com
 
 [HomeAssistant]
 Hubitat.int.intergrem.com
