@@ -1,4 +1,0 @@
----
-- name: This is a hello-world example
-  hosts: all
-  gather_facts: True
