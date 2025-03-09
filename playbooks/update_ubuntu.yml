@@ -1,15 +1,21 @@
-- name: Update and Ubuntu
+- name: Update and Upgrade Ubuntu
   hosts: ubuntu_servers
   become: true
   tasks:
     - name: Update APT package cache
       apt:
         update_cache: yes
-    
+
     - name: Upgrade all packages
       apt:
         upgrade: dist
-    
+      register: upgrade_result
+
     - name: Remove unnecessary packages
       apt:
         autoremove: yes
+
+    - name: Reboot if required by upgrades
+      reboot:
+        msg: "Reboot initiated as system updates require it"
+      when: "'reboot required' in upgrade_result.stdout"
