@@ -1,0 +1,15 @@
+- name: Update and Ubuntu
+  hosts: ubuntu_servers
+  become: true
+  tasks:
+    - name: Update APT package cache
+      apt:
+        update_cache: yes
+    
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+    
+    - name: Remove unnecessary packages
+      apt:
+        autoremove: yes
