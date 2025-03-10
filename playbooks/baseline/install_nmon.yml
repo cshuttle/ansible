@@ -1,0 +1,24 @@
+---
+- name: Install nmon on Ubuntu and RPi/Orange Pi
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Update apt cache (only for Debian-based systems)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Install nmon
+      package:
+        name: nmon
+        state: present
+
+    - name: Modify .bashrc to include nmon alias for cshuttle user
+      lineinfile:
+        path: /home/cshuttle/.bashrc
+        line: "alias nmon='export NMON=cmngt; nmon'"
+        create: yes
+        owner: cshuttle
+        group: cshuttle
+        mode: '0644'
