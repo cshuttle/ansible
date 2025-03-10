@@ -1,0 +1,32 @@
+---
+- name: Disable and Remove UFW
+  hosts: all
+  become: yes
+  tasks:
+    - name: Stop the UFW service
+      systemd:
+        name: ufw
+        state: stopped
+
+    - name: Disable UFW service from starting at boot
+      systemd:
+        name: ufw
+        enabled: no
+
+    - name: Remove UFW package
+      apt:
+        name: ufw
+        state: absent
+      when: ansible_os_family == "Debian"
+
+    - name: Remove UFW package on Red Hat-based systems
+      yum:
+        name: firewalld
+        state: absent
+      when: ansible_os_family == "RedHat"
+
+  handlers:
+    - name: Restart the firewall service if necessary
+      systemd:
+        name: ufw
+        state: restarted
