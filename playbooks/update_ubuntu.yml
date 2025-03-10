@@ -1,5 +1,5 @@
 - name: Update and Upgrade Ubuntu
-  hosts: ubuntu_servers
+  hosts: "Ubuntu Servers"
   become: true
   tasks:
     - name: Update APT package cache
