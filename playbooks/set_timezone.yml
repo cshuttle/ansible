@@ -1,0 +1,46 @@
+---
+- name: Ensure timezone is set to match the Ansible host's timezone
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Get the timezone of the Ansible control node
+      command: timedatectl status | grep 'Time zone' | awk '{print $3}'
+      register: ansible_timezone
+
+    - name: Ensure the remote timezone is set to {{ ansible_timezone.stdout }}
+      lineinfile:
+        path: /etc/localtime
+        src: /usr/share/zoneinfo/{{ ansible_timezone.stdout }}
+        state: link
+
+    - name: Update /etc/timezone on Debian-based systems
+      copy:
+        content: "{{ ansible_timezone.stdout }}"
+        dest: /etc/timezone
+        backup: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Set timezone using timedatectl on Red Hat-based systems
+      command: timedatectl set-timezone {{ ansible_timezone.stdout }}
+      changed_when: "'Time zone' in (command | run_once).stdout"
+      when: ansible_os_family == "RedHat"
+
+    - name: Restart services that may depend on the timezone
+      systemd:
+        state: restarted
+        enabled: yes
+        name: "{{ item }}"
+      loop:
+        - crond  # For cron jobs
+        - ntpd   # For time synchronization
+        - chronyd  # For time synchronization (Chrony)
+      ignore_errors: yes
+
+    - name: Verify the timezone has been set correctly
+      command: timedatectl status | grep 'Time zone'
+      register: verify_timezone
+
+    - name: Print verification result
+      debug:
+        var: verify_timezone.stdout
