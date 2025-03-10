@@ -1,5 +1,5 @@
 - name: Update and Upgrade Raspberry Pi/Orange Pi Systems
-  hosts: "Raspberry PI/OrangePI Servers"
+  hosts: RPI_OrangePIServers
   become: true
   tasks:
     - name: Update APT package cache
