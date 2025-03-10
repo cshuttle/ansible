@@ -1,12 +1,16 @@
+---
 - name: Install Docker and Docker Compose
   hosts: all
   become: yes
 
   tasks:
+
+    # Update apt cache
     - name: Update apt cache
       apt:
         update_cache: yes
 
+    # Install Docker using the official convenience script
     - name: Download and execute Docker convenience script
       shell: |
         curl -fsSL https://get.docker.com -o get-docker.sh
@@ -14,14 +18,41 @@
       args:
         warn: false
 
+    # Start and enable Docker service
     - name: Ensure Docker service is started and enabled
       systemd:
         name: docker
         enabled: yes
         state: started
 
+    # Create /opt/docker-compose directory
+    - name: Create /opt/docker-compose directory
+      file:
+        path: /opt/docker-compose
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    # Install the latest version of Docker Compose in /opt/docker-compose
     - name: Download and install Docker Compose (latest version)
       get_url:
         url: https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)
-        dest: /usr/local/bin/docker-compose
+        dest: /opt/docker-compose/docker-compose
         mode: '0755'
+
+    # Create /opt/docker-data directory with appropriate permissions
+    - name: Create /opt/docker-data directory
+      file:
+        path: /opt/docker-data
+        state: directory
+        owner: root
+        group: docker
+        mode: '2771'  # Set the sticky bit to ensure that files created within have their group ownership preserved
+
+    # Add cshuttle user to the docker group
+    - name: Add cshuttle user to the docker group
+      user:
+        name: cshuttle
+        groups: docker
+        append: yes
