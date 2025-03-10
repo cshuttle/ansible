@@ -1,0 +1,27 @@
+- name: Install Docker and Docker Compose
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Download and execute Docker convenience script
+      shell: |
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
+      args:
+        warn: false
+
+    - name: Ensure Docker service is started and enabled
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Download and install Docker Compose (latest version)
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
